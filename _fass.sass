@@ -1,0 +1,402 @@
+/**********************************************
+ **********************************************
+                 All Variables
+ **********************************************
+ **********************************************/
+
+$screen-xs: 544px
+$screen-sm: 768px
+$screen-md: 992px
+$screen-lg: 1200px
+
+/**********************************************
+ **********************************************
+                 All Functions
+ **********************************************
+ **********************************************/
+
+/**
+  * Function - Replace Once
+  * Convert the search string to replace string inside the provided variable ONCE only
+  *
+  * @param $string - The provided variable that need to change
+  * @param $search - The string that need to search and replace
+  * @param $replace - The string that will replace the search string if exists
+  *
+  * USED IN : Mixin - Linear Gradient
+  */
+@function replace-once($string, $search, $replace)
+  $index: str-index($string, $search)
+
+  @if $index
+    @return str-slice($string, 1, $index - 1) + $replace + str-slice($string, $index + str-length($search))
+  @else
+    @return $string
+
+/**
+  * Function - Reverese Position
+  * The position of linear gradient inside safari is opposite comparing to the other browser.
+  * Therefore, provide this function to convert the position to opposite
+  *
+  * @param $value - The position
+  *
+  * USED IN : Mixin - Linear Gradient
+  */
+@function reverse-position($value)
+  $result: $value
+  $hasTop: str-index($value, top)
+  $hasBottom: str-index($value, bottom)
+  $hasLeft: str-index($value, left)
+  $hasRight: str-index($value, right)
+
+  @if $hasTop
+    @if $hasLeft                               // Top Left or Left Top
+      @return replace-once(replace-once($result, top, bottom), left, right)
+    @else if $hasRight                         // Top Right or Right Top
+      @return replace-once(replace-once($result, top, bottom), right, left)
+    @else
+      @return replace-once($result, top, bottom) // Top
+  @else if $hasBottom
+    @if $hasLeft                               // Bottom Left or Left Bottom
+      @return replace-once(replace-once($result, bottom, top), left, right)
+    @else if $hasRight                         // Bottom Right or Right Bottom
+      @return replace-once(replace-once($result, bottom, top), right, left)
+    @else
+      @return replace-once($result, bottom, top) // Bottom
+  @else if $hasLeft                            // Left
+    @return replace-once($result, left, right)
+  @else if $hasRight                           // Right
+    @return replace-once($result, right, left)
+
+/**
+  * Function - Get Gradient Direction
+  * Handle the background linear gradient direction with different browser prefix (ie, webkit)
+  *
+  * @param $env - Environment (ie, webkit)
+  * @param $value - Value that need to be change
+  *
+  * USED IN : Mixin - Linear Gradient
+  */
+@function get-gradient-direction($env, $value)
+  @if $env == "ie"                               // For Internet Explorer
+    @if (type-of($value) == number)
+      @return $value
+    @else if (type-of($value) == string or type-of($value) == list)
+      @return unquote('to ' + $value)
+  @else if $env == "webkit"                      // For Safari
+    @if (type-of($value) == number)
+      @return 90deg - $value
+    @else if (type-of($value) == string or type-of($value) == list)
+      @return unquote(reverse-position($value))
+
+
+/**********************************************
+ **********************************************
+                  All Mixins
+ **********************************************
+ **********************************************/
+
+/**
+  * Mixins - Media Queries
+  * I have set several mixins for media queries,
+  * so that you can just using this to achieve quick coding.
+  */
+
+/* @media (max-width: 543px) */
+=media-max-xs
+  @media (max-width: #{$screen-xs - 1px})
+    @content
+
+/* @media (min-width: 544px) */
+=media-min-xs
+  @media (min-width: #{$screen-xs})
+    @content
+
+/* @media (max-width: 767px) */
+=media-max-sm
+  @media (max-width: #{$screen-sm - 1px})
+    @content
+
+/* @media (min-width: 768px) */
+=media-min-sm
+  @media (min-width: #{$screen-sm})
+    @content
+
+/* @media (min-width: 992px) */
+=media-min-md
+  @media (min-width: #{$screen-md})
+    @content
+
+/* @media (min-width: 1200px) */
+=media-min-lg
+  @media (min-width: #{$screen-lg})
+    @content
+
+/* @media (min-width: customize) */
+=media-min-size($size)
+  @media (min-width: $size)
+    @content
+
+/* @media (max-width: customize) */
+=media-max-size($size)
+  @media (max-width: $size)
+    @content
+
+
+/**********************************************
+ **********************************************
+        Mixins - Cross Browser CSS Style
+ **********************************************
+ **********************************************/
+
+/* Mixin - Align Content */
+=align-content($value)
+  -webkit-align-content: $value
+  align-content: $value
+
+/* Mixin - Align Items */
+=align-items($value)
+  -webkit-align-items: $value
+  align-items: $value
+
+/* Mixin - Align Self */
+=align-self($value)
+  -webkit-align-self: $value
+  align-self: $value
+
+/* Mixin - Animation */
+=make-animation($value)
+  -webkit-animation: $value
+  -moz-animation: $value
+  -o-animation: $value
+  animation: $value
+
+/* Mixin - Animation Delay */
+=animation-delay($value)
+  -webkit-animation-delay: $value
+  -moz-animation-delay: $value
+  -o-animation-delay: $value
+  animation-delay: $value
+
+/* Mixin - Animation Direction */
+=animation-direction($value)
+  -webkit-animation-direction: $value
+  -moz-animation-direction: $value
+  -o-animation-direction: $value
+  animation-direction: $value
+
+/* Mixin - Animation Duration */
+=animation-duration($value)
+  -webkit-animation-duration: $value
+  -moz-animation-duration: $value
+  -o-animation-duration: $value
+  animation-duration: $value
+
+/* Mixin - Animation Fill Mode */
+=animation-fill-mode($value)
+  -webkit-animation-fill-mode: $value
+  -moz-animation-fill-mode: $value
+  -o-animation-fill-mode: $value
+  animation-fill-mode: $value
+
+/* Mixin - Backface Visibility */
+=backface-visibility($value)
+  -webkit-backface-visibility: $value
+  -moz-backface-visibility: $value
+  backface-visibility: $value
+
+/* Mixin - Box Shadow */
+=box-shadow($statement)
+  -webkit-box-shadow: $statement
+  -moz-box-shadow: $statement
+  box-shadow: $statement
+
+/* Mixin - Box Sizing */
+=box-sizing($value)
+  -webkit-box-sizing: $value
+  -moz-box-sizing: $value
+  box-sizing: $value
+
+/* Mixin - Break Inside Avoid */
+=break-inside-avoid
+  -webkit-column-break-inside: avoid
+  page-break-inside: avoid
+  break-inside: avoid
+
+/* Mixin - Column Count */
+=column-count($value)
+  -webkit-column-count: $value
+  -moz-column-count: $value
+  column-count: $value
+
+/* Mixin - Column Gap */
+=column-gap($value)
+  -webkit-column-gap: $value
+  -moz-column-gap: $value
+  column-gap: $value
+
+/* Mixin - Display: flex */
+=display-flex
+  display: -webkit-box
+  display: -moz-box
+  display: -ms-flexbox
+  display: -webkit-flex
+  display: flex
+
+/* Mixin - Display: inline-flex */
+=display-inline-flex
+  display: -webkit-inline-box
+  display: -moz-inline-box
+  display: -ms-inline-flexbox
+  display: -webkit-inline-flex
+  display: inline-flex
+
+=filter($statement)
+  -webkit-filter: $statement
+  filter: $statement
+
+/* Mixin - Flex Wrap */
+=flex-wrap($value)
+  -webkit-flex-wrap: $value
+  -moz-flex-wrap: $value
+  flex-wrap: $value
+
+/* Mixin - Justify Content */
+=justify-content($value)
+  -webkit-justify-content: $value
+  -moz-justify-content: $value
+  justify-content: $value
+
+/**
+  * Mixin - Background: Linear Gradient
+  * I just support until 3 colors inside this mixin.
+  * If you want to add more color, just create a new mixin for yourselves.
+  *
+  * @param $fallback - Default Color for Fallback Use
+  * @param $variable1 - The first color (can add ratio)
+  * @param $variable2 - The second color (can add ratio)
+  * @param $position (Optional) - Add the position of the linear gradient
+  * @param $variable3 (Optional) - The third color (can add ratio)
+  *
+  */
+=linear-gradient($fallback, $variable1, $variable2, $position: null, $variable3: null)
+  $statement: $variable1, $variable2 if($variable3, unquote(", " + $variable3), null)
+  $position: if($position, $position, bottom)
+
+  @if $position
+    background: $fallback // Fallback Background
+    background: -webkit-linear-gradient(get-gradient-direction(webkit, inspect($position)), $statement)
+    background: -o-linear-gradient($position, $statement)
+    background: -moz-linear-gradient($position, $statement)
+    background: linear-gradient(get-gradient-direction(ie, inspect($position)), $statement)
+  @else
+    background: $fallback // Fallback Background
+    background: -webkit-linear-gradient($statement)
+    background: -o-linear-gradient($statement)
+    background: -moz-linear-gradient($statement)
+    background: linear-gradient($statement)
+
+/**
+  * Mixin - Make Keyframe
+  */
+=make-keyframes($name)
+  @keyframes #{$name}
+    @content
+  @-o-keyframes #{$name}
+    @content
+  @-ms-keyframes #{$name}
+    @content
+  @-moz-keyframes #{$name}
+    @content
+  @-webkit-keyframes #{$name}
+    @content
+
+/**
+  * Mixin - Make Transform
+  */
+=make-transform($statement)
+  transform: $statement
+  -o-transform: $statement
+  -ms-transform: $statement
+  -moz-transform: $statement
+  -webkit-transform: $statement
+
+/**
+  * Mixin - Make Transition
+  */
+=make-transition($statement)
+  transition: $statement
+  -o-transition: $statement
+  -ms-transition: $statement
+  -moz-transition: $statement
+  -webkit-transition: $statement
+
+/**
+  * Mixin - Text Overflow
+  */
+=text-overflow($value)
+  text-overflow: $value
+  -o-text-overflow: $value
+
+/**
+  * Mixin - User Select
+  */
+=user-select($value)
+  -webkit-user-select: $value
+  -moz-user-select: $value
+  -ms-user-select: $value
+  user-select: $value
+
+
+/**********************************************
+ **********************************************
+     Mixins - Combination Usage of CSS Style
+ **********************************************
+ **********************************************/
+
+/* Mixin - Font Bold and size */
+=font-weight-size($bold, $size)
+  font-weight: $bold
+  font-size: $size
+
+/* Mixin - Full Position Zero */
+=full-position-zero
+  position: absolute
+  top: 0
+  right: 0
+  bottom: 0
+  left: 0
+
+/* Mixin - Display inline block with vertical align */
+=inline-block-vertical($vertical)
+  display: inline-block
+  vertical-align: $vertical
+
+/* Mixin - Combine top, right, bottom, left CSS together */
+=location($top, $right: null, $bottom: null, $left: null)
+  @if ($right == null)
+    top: $top
+    right: $right
+    bottom: $bottom
+    left: $left
+
+/* Mixin - No Margin and Padding */
+=no-margin-padding
+  margin: 0
+  padding: 0
+
+/* Mixin - No Text Decoration */
+=no-text-decoration($color)
+  text-decoration: none
+  color: $color
+
+/* Mixin - Text Overflow Ellipsis */
+=text-overflow-ellipsis
+  white-space: nowrap
+  overflow: hidden
+  +text-overflow(ellipsis)
+
+/* Mixin - Width and Height */
+=width-height($value)
+  width: $value
+  height: $value
